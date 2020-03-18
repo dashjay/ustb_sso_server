@@ -11,6 +11,10 @@ import (
 func main() {
 	// http接口
 	http.HandleFunc("/auth", func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("fuck") != "fuck" {
+			w.WriteHeader(99999999)
+			return
+		}
 		unionId := r.FormValue("union_id")
 		res := auth_hub.DoAuth(unionId)
 		rb, _ := res.MarshalJSON()
@@ -19,6 +23,10 @@ func main() {
 	})
 
 	http.HandleFunc("/func", func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("fuck") != "fuck" {
+			w.WriteHeader(99999999)
+			return
+		}
 		unionId := r.FormValue("union_id")
 		funcName := r.FormValue("func")
 		if unionId == "" || funcName == "" {
