@@ -12,7 +12,7 @@ func main() {
 	// http接口
 	http.HandleFunc("/auth", func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("fuck") != "fuck" {
-			w.WriteHeader(99999999)
+			w.WriteHeader(666)
 			return
 		}
 		unionId := r.FormValue("union_id")
@@ -24,7 +24,7 @@ func main() {
 
 	http.HandleFunc("/func", func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("fuck") != "fuck" {
-			w.WriteHeader(99999999)
+			w.WriteHeader(666)
 			return
 		}
 		unionId := r.FormValue("union_id")
