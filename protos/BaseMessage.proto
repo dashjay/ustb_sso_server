@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package protos;
+
+
+message AuthReq {
+    string union_id = 1;
+}
+
+message Response {
+    string type = 1;
+    bytes data = 2;
+}
+
+message FuncReq {
+    string union_id = 1;
+    string func_name = 2;
+}
+
+service AuthServer {
+    rpc Auth (AuthReq) returns (Response);
+    rpc Func (FuncReq) returns (Response);
+}
