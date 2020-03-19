@@ -18,6 +18,13 @@ func main() {
 	// http接口
 	http.HandleFunc("/auth", auth_hub.DoAuthHTTP)
 	http.HandleFunc("/func", auth_hub.DoFuncHTTP)
+	http.HandleFunc("/flush_cache", func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("fuck") != "fuck" {
+			w.WriteHeader(666)
+			return
+		}
+		auth_hub.GetHub().FlushCache()
+	})
 	logging.Info("http-sso server starting ")
 	go func() {
 		err := http.ListenAndServe(fmt.Sprintf(":%s", env.HTTPPort), nil)

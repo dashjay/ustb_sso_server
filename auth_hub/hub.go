@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/boltdb/bolt"
+	"github.com/dashjay/logging"
 
 	"ustb_sso/constant"
 	"ustb_sso/session"
@@ -79,10 +80,30 @@ var (
 	TKNRegexp = regexp.MustCompile(`TKN=(.*);\sV`)
 )
 
-func Newhub() *Hub {
+func NewHub() *Hub {
 	return &Hub{Workers: &sync.Pool{New: func() interface{} {
 		return NewWork()
 	}}}
+}
+
+func (h *Hub) cronTab() {
+	logging.Info("启动hub定时任务")
+	ticker := time.NewTicker(7 * 24 * time.Hour)
+	for {
+		select {
+		case <-ticker.C:
+			h.FlushCache()
+			logging.Info("cache cleaned")
+		}
+	}
+}
+
+func (h *Hub) FlushCache() {
+	session.GetDb().Update(func(tx *bolt.Tx) error {
+		tx.DeleteBucket(session.DBCache)
+		tx.CreateBucket(session.DBCache)
+		return nil
+	})
 }
 
 func (h *Hub) HandlerAuth(unionId string) (<-chan string, <-chan error) {

@@ -17,7 +17,8 @@ import (
 var hub *Hub
 
 func init() {
-	hub = Newhub()
+	hub = NewHub()
+	go hub.cronTab()
 }
 
 var (
@@ -193,4 +194,8 @@ func doFunc(funcName, unionId string) ([]byte, error) {
 	})
 
 	return body, nil
+}
+
+func GetHub() *Hub {
+	return hub
 }
