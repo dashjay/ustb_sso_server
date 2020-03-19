@@ -138,3 +138,29 @@ type AuthStruct struct {
 | info     | 获取用户信息 |
 | ....     | ....         |
 
+# dockerize
+
+在docker化方面我使用了先在`golang:alpine`中编译，然后拷贝到apline中运行，生成的`docker image`只有20M大小，docker真的是好东西。
+
+```
+FROM golang:alpine AS build
+.....
+COPY ./ /go/sso_server
+RUN go build -o sso_server ./main.go
+FROM alpine:latest
+...
+COPY --from=build /go/sso_server /opt/
+EXPOSE 80/tcp 81/tcp
+ENTRYPOINT ["./sso_server"]
+```
+
+
+
+直接在目录下跑
+
+```
+docker build . -t sso_server 
+docker run -d -p 1080:80 -p 1081:81 sso_server:latest
+```
+
+太棒了，现在使用它只需要服务器20M的空间啦~
