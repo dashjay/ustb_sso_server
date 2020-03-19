@@ -10,6 +10,7 @@ import (
 
 var (
 	DBCookies = []byte("cookies")
+	DBCache   = []byte("cache")
 )
 
 var db *bolt.DB
@@ -21,7 +22,7 @@ func init() {
 		log.Panic(err)
 	}
 
-	var tables = [][]byte{DBCookies}
+	var tables = [][]byte{DBCookies, DBCache}
 	err = db.Update(func(tx *bolt.Tx) error {
 		for _, l := range tables {
 			_, err := tx.CreateBucketIfNotExists(l)

@@ -7,9 +7,11 @@ message AuthReq {
     string union_id = 1;
 }
 
-message Response {
-    string type = 1;
-    bytes data = 2;
+message AuthResponse {
+    string url = 1;
+    string uid = 2;
+    string msg = 3;
+    int32 code = 4;
 }
 
 message FuncReq {
@@ -17,7 +19,12 @@ message FuncReq {
     string func_name = 2;
 }
 
-service AuthServer {
-    rpc Auth (AuthReq) returns (Response);
-    rpc Func (FuncReq) returns (Response);
+message FuncResponse {
+    bytes content = 1;
 }
+
+service AuthServer {
+    rpc Auth (AuthReq) returns (AuthResponse);
+    rpc Func (FuncReq) returns (FuncResponse);
+}
+

@@ -3,22 +3,24 @@ package env
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 
+	"github.com/dashjay/logging"
 	"github.com/joho/godotenv"
 )
 
 var (
-	Port   string
-	BoltDB string
+	HTTPPort string
+	GRPCPort string
+	BoltDB   string
 )
 
 func parse() {
-	Port = getDefault("Port", "8080")
+	HTTPPort = getDefault("HTTPPort", "8080")
+	GRPCPort = getDefault("GRPCPort", "8081")
 	BoltDB = getDefault("BoltDB", "cookies.db")
 }
 
@@ -44,7 +46,7 @@ func Load(envFileName string) {
 		os.Exit(-1)
 	}
 
-	log.Printf("Loading environment variables from file: %s\n", envFileName)
+	logging.Infof("Loading environment variables from file: %s\n", envFileName)
 	// If more than one filename passed with comma separated then load from all
 	// of these, a env file can be a partial too.
 	envFiles := strings.Split(envFileName, ",")
@@ -61,7 +63,7 @@ func Load(envFileName string) {
 	envMap, _ := godotenv.Read(envFiles...)
 
 	for k, v := range envMap {
-		log.Printf("%s=%s", k, v)
+		logging.Infof("%s=%s", k, v)
 	}
 
 	parse()

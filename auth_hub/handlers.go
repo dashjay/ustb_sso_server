@@ -3,6 +3,7 @@ package auth_hub
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -25,8 +26,8 @@ var (
 	ErrorUnmarshal = errors.New("ac unmarshal error")
 )
 
-// DoAuth 认证
-func DoAuth(unionId string) structs.AuthStruct {
+// doAuth 认证
+func doAuth(unionId string) structs.AuthStruct {
 
 	if unionId == "" {
 		return structs.AuthStruct{Code: 1, Msg: "unionId empty"}
@@ -82,8 +83,8 @@ func DoAuth(unionId string) structs.AuthStruct {
 	}
 }
 
-// Func 使用学生本来的成绩来获取
-func Func(funcname, unionId string) ([]byte, error) {
+// doFunc 使用学生本来的成绩来获取
+func doFunc(funcName, unionId string) ([]byte, error) {
 
 	if unionId == "" {
 		return []byte{}, errors.New("unionId empty")
@@ -104,13 +105,30 @@ func Func(funcname, unionId string) ([]byte, error) {
 		}
 		return nil
 	})
+
 	if err != nil {
 		return []byte{}, err
 	}
 
 	var req *http.Request
 
-	switch funcname {
+	var res []byte
+	err = session.GetDb().View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(session.DBCache)
+		if b != nil {
+			res = b.Get([]byte(fmt.Sprintf("%s:%s", unionId, funcName)))
+			if res == nil {
+				return errors.New("not found")
+			}
+		}
+		return nil
+	})
+
+	if err == nil && res != nil {
+		return res, nil
+	}
+
+	switch funcName {
 
 	case "grade":
 		req = NewReq("GET", constant.GetGradeURL, ac)
@@ -118,6 +136,20 @@ func Func(funcname, unionId string) ([]byte, error) {
 	case "course":
 		req = NewReq("GET", constant.GetCourseTable, ac)
 		break
+	case "cet":
+		req = NewReq("POST", constant.GetCETScore, ac)
+		break
+	case "head":
+		req = NewReq("POST", constant.GetHeadImageURL, ac)
+		break
+	case "info":
+		req = NewReq("GET", constant.GetStuInfo, ac)
+		break
+	case "exam":
+		req = NewReq("GET", constant.GetExamArrangement, ac)
+		break
+	case "infomore":
+		req = NewReq("GET", constant.GetStuInfoPerfection, ac)
 	case "unbind":
 		err := session.GetDb().Update(func(tx *bolt.Tx) error {
 			b := tx.Bucket(session.DBCookies)
@@ -142,12 +174,23 @@ func Func(funcname, unionId string) ([]byte, error) {
 				Msg string `json:"msg"`
 			}{Msg: "解绑成功，部分功能将会失效。感谢以下开发者为大家提供该服务\n\n1. DJ\n2. XRM"})
 		}
+	default:
+		return []byte("func not exists"), nil
 	}
 
 	body, err := hub.DoGetBody(req)
 	if err != nil {
 		return []byte{}, err
 	}
+
+	defer session.GetDb().Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket(session.DBCache)
+		if b == nil {
+			return err
+		}
+		err = b.Put([]byte(fmt.Sprintf("%s:%s", unionId, funcName)), body)
+		return err
+	})
 
 	return body, nil
 }

@@ -13,9 +13,9 @@ import (
 
 	"github.com/boltdb/bolt"
 
-	"ustb_sso/structs"
 	"ustb_sso/constant"
 	"ustb_sso/session"
+	"ustb_sso/structs"
 )
 
 type Hub struct {
