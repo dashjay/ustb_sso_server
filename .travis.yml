@@ -2,7 +2,7 @@
 # 指明使用的语言
 language: "go"
 
-root: "xenial"
+dist: "xenial"
 
 os:
   - "linux"
