@@ -19,7 +19,7 @@
 # 接口说明
 > http 接口
 
-###认证接口`/auth`
+### 认证接口`/auth`
 请求 `/auth` 时必须携带`fuck`头，模拟`curl`请求如下
 
 ```bash
@@ -48,7 +48,7 @@ type AuthStruct struct {
 
 ```
 
-###函数接口/func
+### 函数接口/func
 请求`/func`时也必须携带fuck头，模拟curl的几个请求如下
 
 #### 请求成绩
